@@ -17,6 +17,8 @@ public class Swetrix {
     private FastLogger logger;
     private Builder config;
 
+    private boolean hasStartedSession = false;
+
     static {
         Swetrix.class.getClassLoader().setDefaultAssertionStatus(true);
     }
@@ -43,14 +45,25 @@ public class Swetrix {
         }
     }
 
+    /* ---------------- */
+    /* Tracking         */
+    /* ---------------- */
+
     /**
-     * Track a custom event. *
+     * Track a custom event.
      * 
-     * @param event  the event name, must be alphanumerical (with _).
-     * @param unique whether or not this event is unique. Unique events do not get
-     *               counted additional times.
+     * @apiNote        In order for this event to be counted correctly, you must
+     *                 call {@link #trackPageView(String)} or
+     *                 {@link #trackPageView(String, String)} for the user session
+     *                 to be started.
+     * 
+     * @param   event  the event name, must be alphanumerical (with _).
+     * @param   unique whether or not this event is unique. Unique events do not get
+     *                 counted additional times.
      */
     public void track(@NonNull String event, boolean unique) {
+        assert this.hasStartedSession : "You must call trackPageView() first in order for the user session to be created.";
+
         if (this.config.analyticsDisabled) {
             this.logger.debug("Analytics are disabled, not sending track request.");
             return;
@@ -107,6 +120,8 @@ public class Swetrix {
      * @see          #trackPageView(String)
      */
     public void trackPageView(@NonNull String page, @NonNull String locale) {
+        this.hasStartedSession = true;
+
         if (this.config.analyticsDisabled) {
             this.logger.debug("Analytics are disabled, not sending trackPageView request.");
             return;
@@ -141,7 +156,7 @@ public class Swetrix {
     }
 
     /* ---------------- */
-    /* Builder Stuff    */
+    /* Builder          */
     /* ---------------- */
 
     /**
