@@ -28,7 +28,7 @@ swetrix.track("my_custom_event", false); // You can also track custom events.
         <dependency>
             <groupId>co.casterlabs</groupId>
             <artifactId>swetrix-java</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
