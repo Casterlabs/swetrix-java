@@ -1,4 +1,4 @@
-# SwetrixApiJava
+# swetrix-java
 
 ```xml
     <repositories>
@@ -10,8 +10,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.casterlabs</groupId>
-            <artifactId>SwetrixApiJava</artifactId>
+            <groupId>co.casterlabs</groupId>
+            <artifactId>swetrix-java</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>

@@ -12,4 +12,4 @@ target/
 .DS_Store
 
 # Misc
-src/main/java/co/casterlabs/swetrixapijava/Test.java
+src/main/java/co/casterlabs/swetrix/Test.java

@@ -1,4 +1,4 @@
-package co.casterlabs.swetrixapijava;
+package co.casterlabs.swetrix;
 
 import java.io.IOException;
 
