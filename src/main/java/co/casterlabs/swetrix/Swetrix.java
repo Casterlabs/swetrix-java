@@ -70,6 +70,47 @@ public class Swetrix {
         }
     }
 
+    public void trackPageView(@NonNull String page) {
+        Locale locale = Locale.getDefault();
+        String lc = locale.toLanguageTag();
+
+        this.trackPageView(page, lc);
+    }
+
+    public void trackPageView(@NonNull String page, @NonNull String locale) {
+        if (this.config.analyticsDisabled) {
+            this.logger.debug("Analytics are disabled, not sending trackPageView request.");
+            return;
+        }
+
+        String timeZone = TimeZone.getDefault().getID();
+
+        try {
+            JsonObject response = HttpUtil.post(
+                this.config.apiUrl,
+                new JsonObject()
+                    .put("pid", this.config.projectId)
+                    .put("pg", page)
+                    .put("tz", timeZone)
+                    .put("lc", locale)
+                    .put("unique", false)
+            );
+
+            if (response == null) {
+                // All good!
+                this.logger.debug("Successfully tracked page view \"%s\" (tz: %s, lc: %s)", page, timeZone, locale);
+                return;
+            }
+
+            String error = response.getString("error");
+            String errorMessage = response.getString("message");
+
+            this.logger.severe("An API error occurred:\n%s: %s", error, errorMessage);
+        } catch (IOException e) {
+            this.logger.severe("An error occurred whilst making API call:\n%s", e);
+        }
+    }
+
     /* ---------------- */
     /* Builder Stuff    */
     /* ---------------- */
