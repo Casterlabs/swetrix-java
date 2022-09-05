@@ -13,6 +13,8 @@ Swetrix swetrix = Swetrix.builder("YOUR_PROJECT_ID")
 swetrix.trackPageView("/"); // Tracking page views is easy.
 
 swetrix.track("my_custom_event", false); // You can also track custom events.
+
+swetrix.startHeartbeat(); // This updates your "Live visitors" statistic in Swetrix. 
 ```
 
 ## Installation (Maven)
