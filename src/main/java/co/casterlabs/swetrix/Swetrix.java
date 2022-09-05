@@ -3,6 +3,7 @@ package co.casterlabs.swetrix;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import co.casterlabs.rakurai.json.element.JsonObject;
 import lombok.AccessLevel;
@@ -14,8 +15,12 @@ import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 public class Swetrix {
+    private static final long HEARTBEAT_INTERVAL = TimeUnit.SECONDS.toMillis(25);
+
     private FastLogger logger;
     private Builder config;
+
+    private Thread heartbeatThread;
 
     private boolean hasStartedSession = false;
 
@@ -153,6 +158,83 @@ public class Swetrix {
         } catch (IOException e) {
             this.logger.severe("An error occurred whilst making API call:\n%s", e);
         }
+    }
+
+    /* ---------------- */
+    /* Heartbeat        */
+    /* ---------------- */
+
+    private void sendHB() {
+        if (this.config.analyticsDisabled) {
+            this.logger.debug("Analytics are disabled, not sending heartbeat.");
+            return;
+        }
+
+        try {
+            JsonObject response = HttpUtil.post(
+                this.config.apiUrl + "/hb",
+                new JsonObject()
+                    .put("pid", this.config.projectId)
+            );
+
+            if (response == null) {
+                // All good!
+                this.logger.debug("Successfully sent heartbeat event.");
+                return;
+            }
+
+            String error = response.getString("error");
+            String errorMessage = response.getString("message");
+
+            this.logger.severe("An API error occurred:\n%s: %s", error, errorMessage);
+        } catch (IOException e) {
+            this.logger.severe("An error occurred whilst making API call:\n%s", e);
+        }
+    }
+
+    /**
+     * Starts the heartbeat signal. This is for the "Live visitors" statistic and
+     * must be started manually by you.
+     * 
+     * @apiNote In order for this event to be counted correctly, you must call
+     *          {@link #trackPageView(String)} or
+     *          {@link #trackPageView(String, String)} for the client session to be
+     *          started.
+     * 
+     * @see     #stopHeartbeat()
+     */
+    public void startHeartbeat() {
+        assert this.hasStartedSession : "You must call trackPageView() first in order for the user session to be created.";
+
+        if (this.heartbeatThread != null) return;
+
+        this.heartbeatThread = new Thread(() -> {
+            Thread current = Thread.currentThread();
+
+            while (!current.isInterrupted()) {
+                this.sendHB();
+
+                try {
+                    Thread.sleep(HEARTBEAT_INTERVAL);
+                } catch (InterruptedException e) {}
+            }
+        });
+        this.heartbeatThread.setName("Swetrix Heartbeat Thread");
+        this.heartbeatThread.setPriority(Thread.MIN_PRIORITY);
+        this.heartbeatThread.setDaemon(true);
+        this.heartbeatThread.start();
+    }
+
+    /**
+     * Stops the hearbeat signal.
+     * 
+     * @see #startHeartbeat()
+     */
+    public void stopHeartbeat() {
+        if (this.heartbeatThread == null) return;
+
+        this.heartbeatThread.interrupt();
+        this.heartbeatThread = null;
     }
 
     /* ---------------- */

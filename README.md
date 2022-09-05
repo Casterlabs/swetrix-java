@@ -37,4 +37,4 @@ swetrix.track("my_custom_event", false); // You can also track custom events.
 ## TODO
  - [x] Page View Tracking
  - [x] Custom Event Tracking
- - [ ] Heartbeats
+ - [x] Heartbeats
