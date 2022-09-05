@@ -21,6 +21,13 @@ public class Swetrix {
         Swetrix.class.getClassLoader().setDefaultAssertionStatus(true);
     }
 
+    /**
+     * Instantiates a new Swetrix Analytics instance.
+     *
+     * @param projectId the project id
+     * 
+     * @see             #builder(String)
+     */
     public Swetrix(@NonNull String projectId) {
         this(new Builder(projectId));
     }
@@ -36,6 +43,13 @@ public class Swetrix {
         }
     }
 
+    /**
+     * Track a custom event. *
+     * 
+     * @param event  the event name, must be alphanumerical (with _).
+     * @param unique whether or not this event is unique. Unique events do not get
+     *               counted additional times.
+     */
     public void track(@NonNull String event, boolean unique) {
         if (this.config.analyticsDisabled) {
             this.logger.debug("Analytics are disabled, not sending track request.");
@@ -70,6 +84,12 @@ public class Swetrix {
         }
     }
 
+    /**
+     * Tracks a page view. This method automatically figures out the locale in
+     * contrast {@link #trackPageView(String, String)}.
+     *
+     * @param page the page
+     */
     public void trackPageView(@NonNull String page) {
         Locale locale = Locale.getDefault();
         String lc = locale.toLanguageTag();
@@ -77,6 +97,15 @@ public class Swetrix {
         this.trackPageView(page, lc);
     }
 
+    /**
+     * Tracks a page view.
+     * 
+     *
+     * @param page   the page
+     * @param locale the locale of the user (e.g en-US)
+     * 
+     * @see          #trackPageView(String)
+     */
     public void trackPageView(@NonNull String page, @NonNull String locale) {
         if (this.config.analyticsDisabled) {
             this.logger.debug("Analytics are disabled, not sending trackPageView request.");
@@ -115,6 +144,14 @@ public class Swetrix {
     /* Builder Stuff    */
     /* ---------------- */
 
+    /**
+     * Creates a new chainable builder for creating a new Swetrix analytics
+     * instance.
+     *
+     * @param  projectId the project id
+     * 
+     * @return           a builder instance.
+     */
     public static Builder builder(@NonNull String projectId) {
         return new Builder(projectId);
     }
@@ -122,9 +159,19 @@ public class Swetrix {
     @ToString
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Builder {
+
+        /** Whether or not debug logs should be printed to console. */
         private final @With boolean debugEnabled;
+
+        /**
+         * Whether or not to disable analytics tracking, useful for debugging/dev
+         * environments.
+         */
         private final @With boolean analyticsDisabled;
+
+        /** The API URL to use, useful for self-hosted instances. */
         private final @With String apiUrl;
+
         private final String projectId;
 
         private Builder(@NonNull String projectId) {
@@ -134,8 +181,13 @@ public class Swetrix {
             this.projectId = projectId;
         }
 
+        /**
+         * Builds a new Swetrix analytics instance based off the settings you've set.
+         *
+         * @return a new Swetrix analytics instance.
+         */
         public Swetrix build() {
-            assert !this.apiUrl.isEmpty() : "Api URL cannot be empty.";
+            assert !this.apiUrl.isEmpty() : "API URL cannot be empty.";
             assert !this.projectId.isEmpty() : "Project ID cannot be empty.";
             return new Swetrix(this);
         }
