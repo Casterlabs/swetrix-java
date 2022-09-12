@@ -30,7 +30,7 @@ swetrix.startHeartbeat(); // This updates your "Live visitors" statistic in Swet
         <dependency>
             <groupId>co.casterlabs</groupId>
             <artifactId>swetrix-java</artifactId>
-            <version>1.1.0</version>
+            <version>LATEST_VERSION_HERE</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

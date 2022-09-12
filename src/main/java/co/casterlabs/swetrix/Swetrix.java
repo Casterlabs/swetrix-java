@@ -47,6 +47,7 @@ public class Swetrix {
 
         if (this.config.debugEnabled) {
             this.logger.debug("Debug mode enabled! Using config: %s", this.config);
+            this.logger.debug("User agent: %s", HttpUtil.userAgent);
         }
     }
 
